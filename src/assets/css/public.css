@@ -1,0 +1,184 @@
+/* header */
+.h_header{
+    height:88px;
+    background:#14BF6D;
+    font-size: 26px;
+    color: #FEFFFF;
+}
+.h_body{
+    width: 1200px;
+    margin: 0 auto;
+    line-height: 88px;
+}
+
+.h_body .h_hd{
+    float: left;
+}
+.h_body .h_hd .logo{
+    display: inline-block;
+    width: 34px;
+    height: 34px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    vertical-align: middle;
+    line-height: 0;
+    position: relative;
+    top: -2px;
+}
+.h_body .h_hd .logo img{
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+}
+.h_body .h_fd{
+    float: right;
+    display: flex;
+    font-size: 16px;
+}
+.h_body .h_fd img{
+    vertical-align: middle;
+}
+.quit{
+    margin-left: 10px;
+    cursor: pointer;
+}
+/* 底部 */
+.f_footer{
+    width: 100%;
+    height: 76px;
+    line-height: 76px;
+    font-size: 14px;
+    color: #5C5C5C;
+    text-align: center;
+    border-top: 1px solid #C3C3C3;
+    background: #F4F6F5;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+/* 容器布局 */
+.el-container{
+    width: 1200px;
+    margin: 0 auto;
+}
+/* 高度根据需求自行设定 */
+.parent{
+    position: absolute;
+    height:100%;
+    width: 100%;
+}
+/* bottom都为0，充满真个页面
+设置Y轴出现滚动条，X轴隐藏 */
+.child{
+    position:absolute;
+    left:0;
+    top:0;
+    right:0;
+    bottom:0;
+    overflow-y:auto !important;
+    overflow-x:hidden !important; 
+    -webkit-overflow-scrolling: touch; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

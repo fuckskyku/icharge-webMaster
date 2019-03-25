@@ -1,0 +1,118 @@
+/* 布局 */ 
+/* 高度根据需求自行设定 */
+.parent{
+    position: absolute;
+    height:100%;
+    width: 100%;
+}
+.child{
+    position:absolute;
+    left:0;
+    top:0;
+    right:0;
+    bottom:0;
+    overflow-y:auto;
+    overflow-x:hidden; 
+    -webkit-overflow-scrolling: touch; 
+}
+/* 登录 */ 
+.login{
+    background: #F4F6F5;
+    background: url('/static/img/login_register_findPassword/bg.png') no-repeat;
+    background-size: 100% 100%;
+    .container{
+        width: 380px;
+        height: 360px;
+        margin: auto;
+        border-radius: 10px;
+        position:absolute;
+        left:0;
+        top:0;
+        right:0;
+        bottom:0;
+        text-align: center;
+        background: #ffffff;
+        .title{
+            width: 390px;
+            height: 40px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: -77px auto 0;
+            font-size: 36px;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .head{
+            width: 100%;
+            height: 80px;
+            line-height: 80px;
+            font-size: 22px;
+            color: #14BF6D;
+            background: #ffffff;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+        .section{
+            padding: 0 40px 50px;
+            .demo-ruleForm{
+
+            }
+            .el-form-item__content{
+                .icon{
+                    width: 14px;
+                    height: 16px;
+                    position: absolute;
+                    top: 50%;
+                    left: 8px;
+                    margin-top: -8px;
+                    z-index: 99;
+                }
+            }
+            .v_input{
+                width: 268px;
+                height: 36px; 
+                line-height: 36px;
+                padding: 0 4px 0 26px; 
+                border: 1px solid #cccccc;
+                border-radius: 5px;
+                outline: none;
+                position: relative;
+            }
+            .verify_code{
+                width: 158px;
+            }
+        }
+        .footer{
+            text-align: right;
+            a{
+                font-size: 14px;
+            }
+        }
+    }
+    
+    .v_container{
+        width:94px;
+        height:36px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 10px;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .v_container:hover{
+        cursor: pointer;
+    }
+    .submit{
+        width: 300px;
+        display: block;
+        margin: 20px auto;
+        background: #14BF6D;
+        color: #ffffff;
+        outline: none;
+        border: 1px solid #14BF6D;
+    }
+}
+

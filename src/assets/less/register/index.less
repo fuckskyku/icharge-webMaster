@@ -1,0 +1,139 @@
+/* 布局 */
+/* 高度根据需求自行设定 */
+.parent {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  z-index: -1;
+}
+
+.child {
+  position: absolute;
+  left: 0;
+  top: 88px;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 注册 */
+.register {
+  background: #F4F6F5;
+
+  .step {
+    width: 700px;
+    margin: 0 auto;
+    margin-top: 60px;
+
+  }
+
+  .container {
+    width: 630px;
+    height: 406px;
+    margin: 186px auto 0;
+    border-radius: 5px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    text-align: center;
+    background: #ffffff;
+    .head {
+      width: 100%;
+      height: 70px;
+      line-height: 70px;
+      font-size: 22px;
+      color: #ffffff;
+      background: #14BF6D;
+    }
+    
+    .section {
+      padding: 56px 163px 50px;
+      .success_icon{
+        width: 95px;
+        height: 95px;
+        margin: 22px auto;
+        img{
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .el-form-item__content {
+        .icon {
+          width: 14px;
+          height: 16px;
+          position: absolute;
+          top: 50%;
+          left: 10px;
+          margin-top: -8px;
+          z-index: 99;
+        }
+      }
+      .v_input {
+        width: 268px;
+        height: 36px;
+        line-height: 36px;
+        padding: 0 4px 0 26px;
+        border: 1px solid #cccccc;
+        border-radius: 5px;
+        outline: none;
+        position: relative;
+      }
+      .verify_code {
+        width: 154px;
+      }
+    }
+    .sec{
+      padding: 0 120px 50px;
+    }
+    .footer {
+      text-align: right;
+      a {
+        font-size: 14px;
+      }
+    }
+  }
+  .checkCode {
+    padding: 11px 0 11px;
+    width: 110px;
+    background: #14BF6D;
+    border: 1px solid #14BF6D;
+    color: #ffffff;
+  }
+  .disabled{
+    padding: 11px 0 11px;
+    width: 110px;
+    background: #C3C3C3;
+    border: 1px solid #C3C3C3;
+    color: #ffffff;
+  }
+  .v_container {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .submit {
+    width: 300px;
+    display: block;
+    margin: 20px auto;
+    background: #14BF6D;
+    border: 1px solid #14BF6D;
+    color: #ffffff;
+  }
+  .quality{
+    margin-top: 33px;
+  }
+  .pd20 {
+    input {
+      padding-left: 40px !important;
+    }
+  }
+}
