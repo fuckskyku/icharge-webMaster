@@ -10,7 +10,7 @@
             <span style="float:right;">
               <el-button
                 class="add"
-                @click="dialogFormVisible = true;dis = true;accountDis = true"
+                @click="addRole('新增角色')"
               >新建</el-button>
             </span>
           </el-row>
@@ -24,7 +24,7 @@
             stripe
             style="width: 100%"
           >
-            <el-table-column prop="roleName" label="角色名称"></el-table-column>
+            <el-table-column prop="name" label="角色名称"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button @click="examine(scope.row,scope.$index)" class="btn examine_btn">查看</el-button>
@@ -37,38 +37,22 @@
       </el-container>
     </div>
     <!-- dialog -->
-    <el-dialog :title="ruleForm.title" :visible.sync="dialogFormVisible">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-        <el-form-item label="角色名称" :label-width="formLabelWidth" prop="account">
-          <el-input class="wd380" :disabled="accountDis" v-model="ruleForm.account"></el-input>
-        </el-form-item>
-        <el-form-item label="姓名" :label-width="formLabelWidth" prop="name">
-          
-        </el-form-item>
-        
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button class="create_account" @click="addAcound('ruleForm')">确 定</el-button>
-      </div>
-    </el-dialog>
+    <roleDialog v-if="dialogFormVisible" @getMessage="showMsg" :title="title"></roleDialog>
+    
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
+import { getRoleList } from "@/api/api";
+import roleDialog from "@/components/pages/dialog/roleDialog"
 
 export default {
   data() {
     return {
       dialogFormVisible: false,
-      dis: false,
-      accountDis: false,
-      tableData: [
-        {
-          roleName: "sc30",
-        },
-        { roleName: "sc30" }
-      ],
+      title: "",
+      tableData: [],
       ruleForm: {
         roleName: ""
       },
@@ -81,9 +65,23 @@ export default {
   computed: {
     ...mapState(["token"])
   },
-  mounted() {},
+  mounted() {
+    // this.getRoleListFun()
+  },
   methods: {
     ...mapActions(["setToKen"]),
+    getRoleListFun() {
+      getRoleList({
+        pageNumber: 1,
+        pageSize: 30,
+      }).then(res=> {
+        if(res.data.code == 200) {
+          if( res.data.data != null && res.data.data != "" ) {
+            this.tableData = res.data.data.list
+          }
+        }
+      })
+    },
     handleEdit(index, row) {
       console.log(index, row);
     },
@@ -98,65 +96,23 @@ export default {
         }
       });
     },
-    
-    addAcound(form) {
-      if (this.ruleForm.title == "新增子账号") {
-        this.$refs[form].validate(valid => {
-          if (valid) {
-            this.$message({
-              type: "success",
-              message: "创建成功!"
-            });
-            this.dialogFormVisible = false;
-          } else {
-            return false;
-          }
-        });
-      } else if (this.ruleForm.title == "修改子账号") {
-        this.$refs[form].validate(valid => {
-          if (valid) {
-            this.$confirm("确认修改?", "提示", {
-              confirmButtonText: "确定",
-              cancelButtonText: "取消",
-              type: "warning",
-              center: true
-            })
-              .then(() => {
-                this.$message({
-                  type: "success",
-                  message: "修改成功!"
-                });
-                this.dialogFormVisible = false;
-              })
-              .catch(() => {
-                this.$message({
-                  type: "info",
-                  message: "已取消修改"
-                });
-              });
-              this.dialogFormVisible = false;
-          } else {
-            return false;
-          }
-        });
-      }else {
-        this.dialogFormVisible = false
-      }
+    showMsg(val) {
+      this.dialogFormVisible = val;
+    },
+    addRole(title) {
+      this.title = title;
+      this.dialogFormVisible = true;
     },
     examine(row, id) {
-      this.dis = true;
-      this.accountDis = true;
       this.dialogFormVisible = true;
-      this.ruleForm.title = "查看子账号";
+      this.title = "查看角色";
     },
     edit(row, id) {
-      this.dis = false;
-      this.accountDis = true;
       this.dialogFormVisible = true;
-      this.ruleForm.title = "修改子账号";
+      this.title = "修改角色";
     },
     del() {
-      this.$confirm("是否删除该账号?", "提示", {
+      this.$confirm("是否删除该角色?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -182,7 +138,9 @@ export default {
       }
     }
   },
-  components: {}
+  components: {
+    roleDialog
+  }
 };
 </script>
 <style scoped lang="less">

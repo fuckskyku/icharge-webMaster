@@ -11,10 +11,10 @@
       <div class="h_fd" v-if="token != ''">
         <div>
           <img src="/static/img/home_other/ic_picture.png" alt="">
-          {{userInfo.nickName}}
+          {{userInfo.mobile}}
         </div>
         <div @click="quit()" class="quit">
-          <img src="/static/img/home_other/ic_quit.png" alt=""> 退出
+          <img src="/static/img/home_other/ic_quit.png" alt="">退出
         </div>
       </div>
     </div>
@@ -22,23 +22,25 @@
 </template>
 <script>
 import { mapState, mapActions } from "vuex";
-import { getStationUserInfo } from "@/api/api";
+import { getStationUserInfo, logout } from "@/api/api";
 
 export default {
   data() {
-    return {};
+    return {
+      token: ""
+    };
   },
   computed: {
-    ...mapState(["token", "userInfo", "companyInfo"])
+    ...mapState([ "userInfo", "companyInfo"])
   },
   mounted() {
-    console.log(this.userInfo);
-    this.init();
+    this.token = this.getLocalStorage('GLOBAL_TOKEN')
+    // this.init()
   },
   methods: {
-    ...mapActions(["setToKen", "setCompanyInfo"]),
+    ...mapActions(["setToKen", "setCompanyInfo", "setClearStore"]),
     init() {
-      getStationUserInfo().then(res => {
+      getStationUserInfo({}).then(res => {
         console.log("res", res.data);
         if (res.data.code == 200) {
           if (res.data.data != null) {
@@ -113,12 +115,45 @@ export default {
                 value: companyInfo.createTime
               }
             ];
-            this.setCompanyInfo(companyInfoObj)
+            this.setCompanyInfo(companyInfoObj);
           }
         }
       });
     },
-    quit() {}
+    quit() {
+      this.$confirm("是否退出登录?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+        center: true
+      })
+        .then(() => {
+          logout().then(res => {
+            this.$notify({
+              title: "提示",
+              message: "退出登录",
+              type: "success"
+            });
+          });
+          this.clearLocalStorage()
+          this.setClearStore();
+          this.$router.push({
+            name: "Login"
+          });
+          // window.localStorage.clear();
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消操作"
+          });
+        });
+    },
+    skip(type) {
+      this.$router.push({
+        name: type
+      });
+    }
   },
   components: {}
 };

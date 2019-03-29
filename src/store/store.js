@@ -17,6 +17,7 @@ const state = {
     expirationDate: '', //过期时间
     staId: '', //桩站ID
     hasCredient: '', //资质认证（-1：表示没有资质认证 0：待审 1：审核通过 2：审核不通过）
+    mobile: "",
   },
   companyInfo: {
     userId: "",
@@ -37,6 +38,10 @@ const state = {
     status: "",
     createTime: "",
   },
+  stationPrice: {
+    electricityPrice: "",
+    servicePrice: ""
+  }
 }
 
 //获取数据（自定义过滤计算）
@@ -47,6 +52,7 @@ const getters = {
   getIsClose: state => state.isClose,
   getUserInfo: state => state.userInfo,
   getCompanyInfo: state => state.companyInfo,
+  getStationPrice: state => state.stationPrice,
 }
 
 //提交方法
@@ -63,6 +69,7 @@ const mutations = {
       state.userInfo.expirationDate = ''
       state.userInfo.staId = ''
       state.userInfo.hasCredient = ''
+      state.userInfo.mobile = ''
       state.companyInfo.userId = ''
       state.companyInfo.licenceName = ''
       state.companyInfo.staId = ''
@@ -79,6 +86,8 @@ const mutations = {
       state.companyInfo.staLng = ''
       state.companyInfo.status = ''
       state.companyInfo.createTime = ''
+      state.stationPrice.electricityPrice = ''
+      state.stationPrice.servicePrice = ''
     }
   },
   defaultActive(state, value) {
@@ -101,6 +110,11 @@ const mutations = {
   companyInfo(state, obj) {
     obj.forEach((item) => {
       Vue.set(state.companyInfo, item.key, item.value);
+    })
+  },
+  stationPrice(state, obj) {
+    obj.forEach((item) => {
+      Vue.set(state.stationPrice, item.key, item.value);
     })
   },
 };
@@ -134,6 +148,9 @@ const actions = {
   },
   setCompanyInfo(state, obj) {
     state.commit("companyInfo", obj);
+  },
+  setStationPrice(state, obj) {
+    state.commit("stationPrice", obj);
   },
 }
 

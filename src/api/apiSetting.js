@@ -7,7 +7,7 @@ import store from '../Store/store';
 let cancel,
 promiseArr = {};
 const CancelToken = axios.CancelToken;
-const TOKEN = store.getters.gettoKen;
+// const TOKEN = window.localStorage.getItem("GLOBALTOKEN");
 axios.defaults.baseURL = '/api';
 axios.defaults.withCredentials = true;
 
@@ -47,6 +47,7 @@ export default {
   //get请求
   get(url, param) {
     return new Promise((resolve, reject) => {
+      
       axios({
         method: "get",
         url,

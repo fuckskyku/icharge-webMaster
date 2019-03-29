@@ -15,6 +15,10 @@ var sidebarObj = [{
   {
     name: 'CouponManagement',
     Active: '3-3',
+  },
+  {
+    name: 'CouponDetails',
+    Active: '3-3',
   }, {
     name: 'RoleManagement',
     Active: '4-1',
@@ -33,7 +37,15 @@ var sidebarObj = [{
     Active: '6-1',
   },
   {
+    name: 'ElectricityBillDetails',
+    Active: '6-1',
+  },
+  {
     name: 'MoneyBills',
+    Active: '6-2',
+  },
+  {
+    name: 'MoneyBillDetails',
     Active: '6-2',
   },
 ];

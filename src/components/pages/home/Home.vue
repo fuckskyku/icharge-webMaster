@@ -3,45 +3,45 @@
     <div class="header">
       <div class="box">
         <div class="box_hd yellow">
-          <img src="/static/img/home_other/ic_electric.png" alt>今天已充电
+          <img src="/static/img/home_other/ic_electric.png" alt="">今天已充电
         </div>
         <div class="box_bd">
           <div class="box_bd_lt">
-            <p>53</p>
+            <p>{{stationInfo.todayChargesCount}}</p>
             <p>次</p>
           </div>
           <div class="box_bd_rt">
-            <p>53</p>
+            <p>{{stationInfo.todayChargesDegree}}</p>
             <p>度</p>
           </div>
         </div>
       </div>
       <div class="box">
         <div class="box_hd red">
-          <img src="/static/img/home_other/ic_station.png" alt>充电桩在用情况
+          <img src="/static/img/home_other/ic_station.png" alt="">充电桩在用情况
         </div>
         <div class="box_bd">
           <div class="box_bd_lt">
-            <p>23</p>
+            <p>{{stationInfo.clientCount}}</p>
             <p>根在用</p>
           </div>
           <div class="box_bd_rt">
-            <p>13</p>
+            <p>{{stationInfo.freeClient}}</p>
             <p>根闲置</p>
           </div>
         </div>
       </div>
       <div class="box">
         <div class="box_hd blue">
-          <img src="/static/img/home_other/ic_money.png" alt>今天已入账
+          <img src="/static/img/home_other/ic_money.png" alt="">今天已入账
         </div>
         <div class="box_bd">
           <div class="box_bd_lt">
-            <p>53</p>
+            <p>{{stationInfo.todayRecordedCount}}</p>
             <p>笔</p>
           </div>
           <div class="box_bd_rt">
-            <p>2013.66</p>
+            <p>{{stationInfo.todayRecorded}}</p>
             <p>元</p>
           </div>
         </div>
@@ -59,25 +59,16 @@
               <div class="cell">电量</div>
               <div class="cell">操作</div>
             </div>
-            <div class="table">
-              <div class="cell">2019年9月3日13</div>
-              <div class="cell">23.7度</div>
-              <div class="cell check">查看</div>
-            </div>
-            <div class="table">
-              <div class="cell">2019年9月3日13</div>
-              <div class="cell">23.7度</div>
-              <div class="cell check">查看</div>
-            </div>
-            <div class="table">
-              <div class="cell">2019年9月3日13</div>
-              <div class="cell">23.7度</div>
-              <div class="cell check">查看</div>
-            </div>
-            <div class="table">
-              <div class="cell">2019年9月3日13</div>
-              <div class="cell">23.7度</div>
-              <div class="cell check">查看</div>
+            <div v-if="chargeOrderEmpty" class="empty">--暂无数据--</div>
+            <div
+              class="table"
+              v-if="!chargeOrderEmpty"
+              v-for="(item,index) in chargeOrderList"
+              :key="index"
+            >
+              <div class="cell">{{ item.createTime | formatDate }}</div>
+              <div class="cell">{{item.degree}}度</div>
+              <div class="cell check" @click="skip('ElectricityBillDetails',item.id)">查看</div>
             </div>
           </div>
         </div>
@@ -86,30 +77,11 @@
             <p>停留过久的车辆</p>
           </div>
           <div class="box_bd">
-            <div class="table">
-              <div class="cell">闽D 655478</div>
-              <div class="cell">张先生</div>
-              <div class="cell check">15805910347</div>
-            </div>
-            <div class="table">
-              <div class="cell">闽D 655478</div>
-              <div class="cell">张先生</div>
-              <div class="cell check">15805910347</div>
-            </div>
-            <div class="table">
-              <div class="cell">闽D 655478</div>
-              <div class="cell">张先生</div>
-              <div class="cell">15805910347</div>
-            </div>
-            <div class="table">
-              <div class="cell">闽D 655478</div>
-              <div class="cell">张先生</div>
-              <div class="cell">15805910347</div>
-            </div>
-            <div class="table">
-              <div class="cell">闽D 655478</div>
-              <div class="cell">张先生</div>
-              <div class="cell">15805910347</div>
+            <div class="empty" v-if="cardEmpty">--暂无数据--</div>
+            <div class="table" v-if="!cardEmpty" v-for="(item,index) in cardList" :key="index">
+              <div class="cell">{{cardList.numberPlate}}</div>
+              <div class="cell">{{cardList.nickName}}</div>
+              <div class="cell check">{{cardList.mobile}}</div>
             </div>
           </div>
         </div>
@@ -128,39 +100,12 @@
             <div class="cell">金额</div>
             <div class="cell">操作</div>
           </div>
-          <div class="table">
-            <div class="cell">2019年9月3日13</div>
-            <div class="cell">收入</div>
-            <div class="cell">充电</div>
-            <div class="cell">98</div>
-            <div class="cell check">查看</div>
-          </div>
-          <div class="table">
-            <div class="cell">2019年9月3日13</div>
-            <div class="cell">收入</div>
-            <div class="cell">充电</div>
-            <div class="cell">98</div>
-            <div class="cell check">查看</div>
-          </div>
-          <div class="table">
-            <div class="cell">2019年9月3日13</div>
-            <div class="cell">收入</div>
-            <div class="cell">充电</div>
-            <div class="cell">98</div>
-            <div class="cell check">查看</div>
-          </div>
-          <div class="table">
-            <div class="cell">2019年9月3日13</div>
-            <div class="cell">收入</div>
-            <div class="cell">充电</div>
-            <div class="cell">98</div>
-            <div class="cell check">查看</div>
-          </div>
-          <div class="table">
-            <div class="cell">2019年9月3日13</div>
-            <div class="cell">收入</div>
-            <div class="cell">充电</div>
-            <div class="cell">98</div>
+          <div class="empty" v-if="moneyEmpty">--暂无数据--</div>
+          <div class="table" v-if="!moneyEmpty" v-for="(item,index) in moneyList" :key="index">
+            <div class="cell">{{ item.createTime | formatDate }}</div>
+            <div class="cell">{{item.name}}</div>
+            <div class="cell">{{item.remark}}</div>
+            <div class="cell">{{item.price}}元</div>
             <div class="cell check">查看</div>
           </div>
         </div>
@@ -172,23 +117,80 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import Aside from "@/components/publicTemplate/Aside";
+import {
+  getStationIndexInfo,
+  getstationchargespendloglist,
+  getchargeorderlist
+} from "@/api/api";
 
 export default {
   data() {
-    return {};
+    return {
+      stationInfo: {},
+      chargeOrderList: [],
+      moneyList: [],
+      cardList: [],
+      chargeOrderEmpty: false,
+      moneyEmpty: false,
+      cardEmpty: false
+    };
   },
   computed: {
-    ...mapState(["token","companyInfo"])
+    ...mapState(["token", "companyInfo"])
   },
   mounted() {
+    var that = this
+    // this.clearLocalStorage()
+    this.$nextTick(() =>{
+      that.init();
+    })
   },
   methods: {
-    ...mapActions(["setToKen","setCompanyInfo"]),
-    
+    ...mapActions(["setToKen", "setCompanyInfo", "setClearStore"]),
+    init() {
+      // 获取桩站首页信息详情
+      getStationIndexInfo({}).then(res => {
+        if (res.data.code == 200 && res.data.data != null) {
+          this.stationInfo = res.data.data;
+          this.cardList = res.data.data.parkingList;
+          if (res.data.data.parkingList == "") {
+            this.cardEmpty = true;
+          }
+        }
+      });
+      // 获取资金记录列表
+      getstationchargespendloglist({
+        pageNumber: 1,
+        pageSize: 5
+      }).then(res => {
+        if (res.data.code == 200) {
+          if (res.data.data != null) {
+            this.chargeOrderList = res.data.data.list;
+            if (res.data.data.list == "") {
+              this.moneyEmpty = true;
+            }
+          }
+        }
+      });
+      // 获取用电记录列表
+      getchargeorderlist({
+        pageNumber: 1,
+        pageSize: 5
+      }).then(res => {
+        if (res.data.code == 200) {
+          if (res.data.data != null) {
+            this.moneyList = res.data.data.list;
+            if (res.data.data.list == "") {
+              this.chargeOrderEmpty = true;
+            }
+          }
+        }
+      });
+    },
     skip(type, param) {
       this.$router.push({
         name: type,
-        params: {
+        query: {
           id: param
         }
       });
@@ -377,6 +379,11 @@ export default {
         }
       }
     }
+  }
+  .empty {
+    text-align: center;
+    margin: 40px 0;
+    color: #797979;
   }
 }
 </style>

@@ -8,7 +8,7 @@
       </div>
       <div class="content" v-if="!visibility">
         <div class="img_success">
-          <img src="/static/img/quality/img_success.png" alt>
+          <img src="/static/img/quality/img_success.png" alt="">
         </div>
         <div class="desc">您已成功提交资质认证信息，请耐心等待我司工作人员的审核处理。审核通过后，我司会与您联系并且签订合同、收取保证金、安排对接。</div>
       </div>
@@ -33,9 +33,9 @@
               :action="upload_qiniu_url"
               :show-file-list="false"
               :on-success="handleStationSuccess"
-              :on-error="handleError"
               :before-upload="beforeStationUpload"
               :data="qiniuData"
+              :accept="accept"
             >
               <el-button type="success" @click="getQiniuTokenFun();">点击上传图片</el-button>
             </el-upload>
@@ -53,9 +53,9 @@
               :action="upload_qiniu_url"
               :show-file-list="false"
               :on-success="handleSuccess"
-              :on-error="handleError"
-              :before-upload="beforeUpload"
+              :before-upload="beforeStationUpload"
               :data="qiniuData"
+              :accept="accept"
             >
               <el-button type="success" @click="getQiniuTokenFun();">点击上传图片</el-button>
             </el-upload>
@@ -63,7 +63,7 @@
           <el-form-item label="桩站具体地址:" prop="stationAddress">
             <el-input
               class="wd380"
-              @blur="search()"
+              @blur="searchs()"
               v-model="ruleForm.stationAddress"
               placeholder="请填写桩站具体地址"
             ></el-input>
@@ -235,7 +235,8 @@ export default {
       },
       upload_qiniu_url: "https://upload.qiniup.com", // 七牛云上传储存区域的上传域名
       imgQiniuUrl: "http://img.mseenet.com/", //七牛图片外链
-      qiniuToken: ""
+      qiniuToken: "",
+      accept: "image/jpeg, image/png"
     };
   },
   computed: {
@@ -257,7 +258,7 @@ export default {
   methods: {
     ...mapActions(["setToKen", "setCompanyInfo"]),
     // 返回地址解析结果
-    search() {
+    searchs() {
       var that = this;
       //智能搜索
       that.localSearch = new BMap.LocalSearch(that.map, {
@@ -280,67 +281,56 @@ export default {
         } else {
           this.visibility = false;
           var companyInfo = res.data.data;
-          var companyInfoObj = [{ key: "userId", value: companyInfo.userId},
-            { key: "licenceName", value: companyInfo.licenceName},
+          var companyInfoObj = [
+            { key: "userId", value: companyInfo.userId },
+            { key: "licenceName", value: companyInfo.licenceName },
             { key: "staId", value: companyInfo.staId },
-            {key: "licenceCode", value: companyInfo.licenceCode },
-            {key: "licenceImg",value: companyInfo.licenceImg },
-            {key: "managerName",value: companyInfo.managerName},
-            {key: "managerIdcardNo",value: companyInfo.managerIdcardNo},
-            {key: "managerHandIdcardImg",value: companyInfo.managerHandIdcardImg},
+            { key: "licenceCode", value: companyInfo.licenceCode },
+            { key: "licenceImg", value: companyInfo.licenceImg },
+            { key: "managerName", value: companyInfo.managerName },
+            { key: "managerIdcardNo", value: companyInfo.managerIdcardNo },
+            {
+              key: "managerHandIdcardImg",
+              value: companyInfo.managerHandIdcardImg
+            },
             { key: "bankName", value: companyInfo.bankName },
-            { key: "bankCard",value: companyInfo.bankCard },
-            {key: "bankAdress",value: companyInfo.bankAdress},
-            {key: "staAdress",value: companyInfo.staAdress},
-            {key: "remarks",value: companyInfo.remarks},
-            { key: "staLat",value: companyInfo.staLat},
-            {key: "remarks",value: companyInfo.remarks},
-            {key: "staLng", value: companyInfo.staLng},
-            { key: "status", value: companyInfo.status},
-            {key: "createTime",value: companyInfo.createTime},
+            { key: "bankCard", value: companyInfo.bankCard },
+            { key: "bankAdress", value: companyInfo.bankAdress },
+            { key: "staAdress", value: companyInfo.staAdress },
+            { key: "remarks", value: companyInfo.remarks },
+            { key: "staLat", value: companyInfo.staLat },
+            { key: "remarks", value: companyInfo.remarks },
+            { key: "staLng", value: companyInfo.staLng },
+            { key: "status", value: companyInfo.status },
+            { key: "createTime", value: companyInfo.createTime }
           ];
-          that.setCompanyInfo(companyInfoObj);
-          this.skip("ApproveFaild");
+          console.log(companyInfoObj)
+          this.setCompanyInfo(companyInfoObj);
+          this.$router.push({
+            name: "ApproveFaild"
+          });
         }
       });
     },
     handleStationSuccess(res, file) {
+      console.log(res);
+
       this.ruleForm.licenseUrl = this.imgQiniuUrl + res.key;
       this.licenseUrl = this.ruleForm.licenseUrl;
     },
     beforeStationUpload(file) {
-      this.qiniuData.key = file.name;
-      const isJPG = file.type === "image/jpeg";
-      const isPNG = file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isJPG && !isPNG) {
-        this.$message.error("上传头像图片只能是 JPG/PNG 格式!");
-      }
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB!");
+        return;
+      } else {
+        this.qiniuData.key = file.name;
       }
-      return isJPG && isLt2M;
+      return isLt2M;
     },
     handleSuccess(res, file) {
       this.ruleForm.identityUrl = this.imgQiniuUrl + res.key;
       this.identityUrl = this.ruleForm.identityUrl;
-    },
-    beforeUpload(file) {
-      this.qiniuData.key = file.name;
-      const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
-      }
-      if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
-      }
-      return isJPG && isLt2M;
-    },
-    handleError(res) {
-      console.log(res);
     },
     // 获取七牛token
     getQiniuTokenFun() {

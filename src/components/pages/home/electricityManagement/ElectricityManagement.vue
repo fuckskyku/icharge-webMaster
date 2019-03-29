@@ -1,7 +1,7 @@
 <template>
   <div class="electricityManagement">
     <div class="header">
-      <p>更改密码</p>
+      <p>电费管理</p>
     </div>
     <div class="section">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="220px" class="ruleForm">
@@ -13,19 +13,28 @@
         </el-form-item>
         <el-form-item>
           <el-button class="btn" type="success" @click="submit('ruleForm')">提交电价设置</el-button>
-          <el-button class="btn cancel" type="success" @click="skip('')">设置各时段涨跌</el-button>
+          <el-button class="btn cancel" type="success" @click="addElectricity">设置各时段涨跌</el-button>
         </el-form-item>
       </el-form>
     </div>
+    <!-- dialog -->
+    <electricityDialog v-if="dialogFormVisible" @getMessage="showMsg" :msg="msg" :title="title"></electricityDialog>
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
+import { settingstationprice } from "@/api/api";
+import utils from "@/utils/index";
+import electricityDialog from "@/components/pages/dialog/electricityDialog";
 
 export default {
   data() {
     return {
+      visibility: false,
+      dialogFormVisible: false,
+      title: "新增时段电价",
+      msg: "0",
       ruleForm: {
         electricCharge: "",
         serviceCharge: ""
@@ -41,23 +50,77 @@ export default {
     };
   },
   computed: {
-    ...mapState(["token"])
+    ...mapState(["token","stationPrice"])
   },
-  mounted() {},
+  mounted() {
+    this.ruleForm = this.stationPrice
+  },
   methods: {
-    ...mapActions(["setToKen"]),
+    ...mapActions(["setToKen","setStationPrice"]),
+    addElectricity() {
+      this.dialogFormVisible = true;
+    },
+    showMsg(val) {
+      this.dialogFormVisible = val;
+    },
     submit(form) {
+      var that = this;
       this.$refs[form].validate(valid => {
+        if (
+          !utils.number(this.ruleForm.electricCharge) ||
+          !utils.number(this.ruleForm.serviceCharge)
+        ) {
+          that.$notify({
+            title: "提示",
+            message: "输入有误，请重新输入",
+            type: "error"
+          });
+          return;
+        }
         if (valid) {
-          alert("submit!");
+          settingstationprice({
+            ElectricityPrice: this.ruleForm.electricCharge,
+            ServicePrice: this.ruleForm.serviceCharge
+          }).then(res => {
+            if (res.data.code == 200) {
+              var priceObj = [
+                {
+                  key: "electricityPrice",
+                  value: this.ruleForm.electricCharge
+                },
+                {
+                  key: "servicePrice",
+                  value: this.ruleForm.serviceCharge
+                }
+              ]
+              this.setStationPrice(priceObj)
+              that.$notify({
+                title: "提示",
+                message: "设置成功",
+                type: "success"
+              });
+            } else {
+              that.$notify({
+                title: "提示",
+                message: res.data.message,
+                type: "success"
+              });
+            }
+          });
         } else {
-          console.log("error submit!!");
+          // that.$notify({
+          //   title: "提示",
+          //   message: "设置失败，请重新设置",
+          //   type: "error"
+          // });
           return false;
         }
       });
     }
   },
-  components: {}
+  components: {
+    electricityDialog
+  }
 };
 </script>
 <style scoped lang="less">
@@ -86,18 +149,18 @@ export default {
     width: 186px;
     background: #14bf6d;
   }
-  .btn{
-    width:186px;
-    height:40px;
-    background:#14BF6D;
-    border-radius:5px;
+  .btn {
+    width: 186px;
+    height: 40px;
+    background: #14bf6d;
+    border-radius: 5px;
     border: none;
     margin-top: 40px;
   }
-  .cancel{
-    background:#ffffff;
-    border: 1px solid #14BF6D;
-    color: #14BF6D;
+  .cancel {
+    background: #ffffff;
+    border: 1px solid #14bf6d;
+    color: #14bf6d;
     margin-left: 40px;
   }
 }

@@ -5,8 +5,12 @@
       <div class="header">
         <p>桩站资质认证</p>
       </div>
-      <div class="approve_status review" v-if="companyInfo.status == 0">审核中</div>
-      <div class="approve_status" v-if="companyInfo.status == 2">审核失败：*****</div>
+      <div style="padding:20px 30px;">
+        <el-alert title="资质认证审核中" type="warning" v-if="companyInfo.status == 0" show-icon></el-alert>
+        <el-alert title="资质认证审核失败：请重新填写" v-if="companyInfo.status == 2" type="error" show-icon></el-alert>
+      </div>
+      <!-- <div class="approve_status review" v-if="companyInfo.status == 0">审核中</div>
+      <div class="approve_status" v-if="companyInfo.status == 2">审核失败：请重新填写</div> -->
       <div class="section">
         <el-form :model="ruleForm" ref="ruleForm" label-width="300px" class="demo-ruleForm">
           <el-form-item label="桩站公司名称:" prop="licenceName">
@@ -37,9 +41,8 @@
             <el-input class="wd380" disabled v-model="ruleForm.bankCard"></el-input>
             <div class="el-upload__tip">* 个体户的必须用法人本身的银行账号，企业必须用对公账号。不支持信用卡，6~35位</div>
           </el-form-item>
-
           <el-form-item label="银行卡开户地址:" required>
-            <el-input class="wd160" disabled v-model="ruleForm.bankAdress"></el-input>
+            <el-input class="wd380" disabled v-model="ruleForm.bankAdress"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button class="wd186" type="success" @click="skip('Approve')">重新填写</el-button>
@@ -53,9 +56,7 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-import {
-  getStationUserInfo
-} from "@/api/api";
+import { getStationUserInfo } from "@/api/api";
 import Header from "@/components/publicTemplate/Header";
 
 export default {
@@ -68,44 +69,51 @@ export default {
     ...mapState(["token", "ak", "userInfo", "companyInfo"])
   },
   mounted() {
-    this.init()
-    this.ruleForm = this.companyInfo
-    if(this.companyInfo.status == 1) {
-      this.skip("Home")
+    this.init();
+    this.ruleForm = this.companyInfo;
+    if (this.companyInfo.status == 1) {
+      var userInfoObj = [
+        {
+          key: "hasCredient",
+          value: 1
+        }
+      ];
+      this.setUserInfo(userInfoObj);
+      this.skip("Home");
     }
-    if(this.companyInfo.status == 2){
-      
-    }
-    console.log("companyInfo", this.companyInfo);
   },
   methods: {
-    ...mapActions(["setToKen", "setUserInfo","setCompanyInfo"]),
+    ...mapActions(["setToKen", "setUserInfo", "setCompanyInfo"]),
     init() {
-      getStationUserInfo().then(res=> {
-        if(res.data.code == 200) {
+      getStationUserInfo().then(res => {
+        if (res.data.code == 200) {
           var companyInfo = res.data.data;
-          var companyInfoObj = [{ key: "userId", value: companyInfo.userId},
-            { key: "licenceName", value: companyInfo.licenceName},
+          var companyInfoObj = [
+            { key: "userId", value: companyInfo.userId },
+            { key: "licenceName", value: companyInfo.licenceName },
             { key: "staId", value: companyInfo.staId },
-            {key: "licenceCode", value: companyInfo.licenceCode },
-            {key: "licenceImg",value: companyInfo.licenceImg },
-            {key: "managerName",value: companyInfo.managerName},
-            {key: "managerIdcardNo",value: companyInfo.managerIdcardNo},
-            {key: "managerHandIdcardImg",value: companyInfo.managerHandIdcardImg},
+            { key: "licenceCode", value: companyInfo.licenceCode },
+            { key: "licenceImg", value: companyInfo.licenceImg },
+            { key: "managerName", value: companyInfo.managerName },
+            { key: "managerIdcardNo", value: companyInfo.managerIdcardNo },
+            {
+              key: "managerHandIdcardImg",
+              value: companyInfo.managerHandIdcardImg
+            },
             { key: "bankName", value: companyInfo.bankName },
-            { key: "bankCard",value: companyInfo.bankCard },
-            {key: "bankAdress",value: companyInfo.bankAdress},
-            {key: "staAdress",value: companyInfo.staAdress},
-            {key: "remarks",value: companyInfo.remarks},
-            { key: "staLat",value: companyInfo.staLat},
-            {key: "remarks",value: companyInfo.remarks},
-            {key: "staLng", value: companyInfo.staLng},
-            { key: "status", value: companyInfo.status},
-            {key: "createTime",value: companyInfo.createTime},
+            { key: "bankCard", value: companyInfo.bankCard },
+            { key: "bankAdress", value: companyInfo.bankAdress },
+            { key: "staAdress", value: companyInfo.staAdress },
+            { key: "remarks", value: companyInfo.remarks },
+            { key: "staLat", value: companyInfo.staLat },
+            { key: "remarks", value: companyInfo.remarks },
+            { key: "staLng", value: companyInfo.staLng },
+            { key: "status", value: companyInfo.status },
+            { key: "createTime", value: companyInfo.createTime }
           ];
           this.setCompanyInfo(companyInfoObj);
         }
-      })
+      });
     },
     skip(type) {
       this.$router.push({

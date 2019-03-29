@@ -27,8 +27,14 @@ export const isregistermobile = param => { return api.get('/station/isregistermo
 //忘记密码
 export const forgetpassword = param => { return api.post('/station/forgetpassword', param) }
 
+//修改密码 
+export const updatepassword = param=>{return api.post('/api/station/updatepassword',param)};
+
 //退出登录
 export const logout = param => { return api.post('/station/logout', param) }
+
+// 获取桩站首页信息详情
+export const getStationIndexInfo = param => { return api.get('/station/getStationIndexInfo', param) }
 
 //获取优惠券列表
 export const getcouponlist = param => { return api.get('/station/getcouponlist', param) }
@@ -38,6 +44,9 @@ export const getstationcoupondetail = param => { return api.get('/station/getsta
 
 //新建优惠券
 export const addcoupon = param => { return api.post('/station/addcoupon', param) }
+
+//删除优惠券
+export const delCoupon = param => { return api.get('/station/delCoupon', param) }
 
 //获取桩站公司信息详情
 export const getStationUserInfo = param => { return api.get('/station/getStationUserInfo', param) }

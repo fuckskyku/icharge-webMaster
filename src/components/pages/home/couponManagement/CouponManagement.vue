@@ -10,7 +10,7 @@
             <span style="float:right;">
               <el-button
                 class="add"
-                @click="dialogFormVisible = true;dis = true;accountDis = true"
+                @click="addcoupon"
               >新建</el-button>
             </span>
           </el-row>
@@ -24,20 +24,26 @@
             stripe
             style="width: 100%"
           >
-            <el-table-column prop="couponID" label="优惠券ID" ></el-table-column>
-            <el-table-column prop="status" label="状态"></el-table-column>
+            <el-table-column prop="id" label="优惠券ID"></el-table-column>
+            <el-table-column prop="statusName" label="状态"></el-table-column>
             <el-table-column prop="price" label="面额"></el-table-column>
             <el-table-column prop="threshold" label="门槛"></el-table-column>
             <el-table-column prop="totalNumber" label="总数"></el-table-column>
             <el-table-column prop="limitNumber" label="限领"></el-table-column>
-            <el-table-column prop="receiveTime" label="领取起止时间"></el-table-column>
-            <el-table-column prop="useTime" label="使用起止时间">
-
+            <el-table-column label="领取起止时间" :show-overflow-tooltip="true">
+              <template slot-scope="scope">
+                <span>{{scope.row.getStartTime | formatDate }}-{{scope.row.getEndTime | formatDate }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="使用起止时间" :show-overflow-tooltip="true">
+              <template slot-scope="scope">
+                <span>{{scope.row.useStartTime | formatDate }}-{{scope.row.useEndTime | formatDate }}</span>
+              </template>
             </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button @click="examine('CouponDetails',scope.$index)" class="btn examine_btn">查看</el-button>
-                <el-button @click="del(scope.$index,scope.row)" class="btn delete_btn">删除</el-button>
+                <el-button @click="skip('CouponDetails',scope.row.id)" class="btn examine_btn">查看</el-button>
+                <el-button @click="del(scope.row.id)" class="btn delete_btn">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -45,173 +51,91 @@
       </el-container>
     </div>
     <!-- dialog -->
-    <el-dialog :title="ruleForm.title" :visible.sync="dialogFormVisible">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-        <el-form-item label="面额" :label-width="formLabelWidth" prop="couponID">
-          <el-input class="wd380" v-model="ruleForm.price" placeholder="元"></el-input>
-        </el-form-item>
-        <el-form-item label="门槛" :label-width="formLabelWidth" prop="price">
-          <el-input class="wd380" v-model="ruleForm.threshold" placeholder="元"></el-input>
-        </el-form-item>
-        <el-form-item label="总数" :label-width="formLabelWidth" prop="price">
-          <el-input class="wd380" v-model="ruleForm.totalNumber" placeholder="元"></el-input>
-        </el-form-item>
-        <el-form-item label="限领" :label-width="formLabelWidth" prop="price">
-          <el-input class="wd380" v-model="ruleForm.limitNumber" placeholder="元"></el-input>
-        </el-form-item>
-        <el-form-item label="设置领取起止时间" :label-width="formLabelWidth" prop="price">
-          <el-input class="wd380" v-model="ruleForm.getStartTime" placeholder="元"></el-input>
-        </el-form-item>
-        <el-form-item label="设置使用起止时间" :label-width="formLabelWidth" prop="price">
-          <el-input class="wd380" v-model="ruleForm.useEndTime" placeholder="元"></el-input>
-        </el-form-item>
-      </el-form>
-      <div style="text-indent:200px;">注意：用户可以在领取时间段预先领取，但在使用时间段内才能使用。</div>
-      <div slot="footer" class="dialog-footer">
-        <el-button class="create_account" @click="addAcound('ruleForm')">确 定</el-button>
-      </div>
-    </el-dialog>
+    <couponDialog v-if="dialogFormVisible" @getMessage="showMsg" :title="title"></couponDialog>
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
+import { getcouponlist, delCoupon } from "@/api/api";
+import couponDialog from "@/components/pages/dialog/couponDialog";
 
 export default {
   data() {
     return {
+      title: "",
       dialogFormVisible: false,
-      dis: false,
-      accountDis: false,
-      tableData: [
-        {
-          couponID: "YHQ6534452143",
-          status: "可用",
-          price: "30",
-          threshold: "50",
-          totalNumber: "11",
-          limitNumber: "2",
-          receiveTime: "2019年3月12日-2019年4月12日",
-          useTime: "2019年3月12日-2019年4月12日",
-        }
-      ],
-      ruleForm: {
-        price: "",
-        threshold: "",
-        totalNumber: "",
-        limitNumber: "",
-        getStartTime: "",
-        getEndTime: "",
-        useStartTime: "",
-        useEndTime: "",
-        title: "新增优惠券"
-      },
-      rules: {
-        price: [{ required: true, message: "请输入面额", trigger: "blur" }],
-        threshold: [{ required: true, message: "请输入使用门槛", trigger: "blur" }],
-        totalNumber: [{ required: true, message: "请输入总数", trigger: "blur" }],
-        limitNumber: [{ required: true, message: "请输入限领数", trigger: "blur" }],
-        getStartTime: [{ required: true, message: "请输入领取开始时间", trigger: "blur" }],
-        getEndTime: [{ required: true, message: "请输入领取结束时间", trigger: "blur" }],
-        useStartTime: [{ required: true, message: "请输入使用结束时间", trigger: "blur" }],
-        useEndTime: [{ required: true, message: "请输入使用结束时间", trigger: "blur" }],
-      },
-      formLabelWidth: "200px",
+      tableData: []
     };
   },
   computed: {
     ...mapState(["token"])
   },
-  mounted() {},
+  mounted() {
+    this.init();
+  },
   methods: {
     ...mapActions(["setToKen"]),
-    handleEdit(index, row) {
-      console.log(index, row);
+    init() {
+      this.getcouponlistFun()
     },
-    handleDelete(index, row) {
-      console.log(index, row);
+    getcouponlistFun() {
+      getcouponlist({}).then(res => {
+        if (res.data.code == 200) {
+          if (res.data.code == 200 && res.data.data != null) {
+            this.tableData = res.data.data.list;
+          }
+        }
+      });
     },
     skip(type, param) {
       this.$router.push({
         name: type,
-        params: {
+        query: {
           id: param
         }
       });
     },
-    addAcound(form) {
-      if (this.ruleForm.title == "新增子账号") {
-        this.$refs[form].validate(valid => {
-          if (valid) {
-            this.$message({
-              type: "success",
-              message: "创建成功!"
-            });
-            this.dialogFormVisible = false;
-          } else {
-            return false;
-          }
-        });
-      } else if (this.ruleForm.title == "修改子账号") {
-        this.$refs[form].validate(valid => {
-          if (valid) {
-            this.$confirm("确认修改?", "提示", {
-              confirmButtonText: "确定",
-              cancelButtonText: "取消",
-              type: "warning",
-              center: true
-            })
-            .then(() => {
-              this.$message({
-                type: "success",
-                message: "修改成功!"
-              });
-              this.dialogFormVisible = false;
-            })
-            .catch(() => {
-              this.$message({
-                type: "info",
-                message: "已取消修改"
-              });
-            });
-            this.dialogFormVisible = false;
-          } else {
-            return false;
-          }
-        });
-      }else {
-        this.dialogFormVisible = false
-      }
-    },
-    examine(type, id) {
-      this.skip(type,id)
-      this.ruleForm.title = "查看子账号";
-    },
-    edit(row, id) {
-      this.dis = false;
-      this.accountDis = true;
-      this.dialogFormVisible = true;
-      this.ruleForm.title = "修改子账号";
-    },
-    del() {
-      this.$confirm("是否删除该账号?", "提示", {
+    del(id) {
+      this.$confirm("是否删除该优惠券?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
         center: true
       })
-      .then(() => {
-        this.$message({
-          type: "success",
-          message: "删除成功!"
+        .then(() => {
+          delCoupon({
+            id: id
+          }).then(res=> {
+            if(res.data.code == 200){
+              this.$message({
+                type: "success",
+                message: "删除成功!"
+              });
+              this.getcouponlistFun()
+            }else{
+              this.$message({
+                type: "error",
+                message: res.data.message
+              });
+            }
+          })
+          
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
         });
-      })
-      .catch(() => {
-        this.$message({
-          type: "info",
-          message: "已取消删除"
-        });
-      });
+    },
+    addcoupon() {
+      this.title = "新增优惠券"
+      this.dialogFormVisible = true
+    },
+    showMsg(val) {
+      this.dialogFormVisible = val;
+      this.getcouponlistFun()
     },
     // 修改table header的背景色
     tableHeaderColor({ row, column, rowIndex, columnIndex }) {
@@ -220,7 +144,9 @@ export default {
       }
     }
   },
-  components: {}
+  components: {
+    couponDialog
+  }
 };
 </script>
 <style scoped lang="less">

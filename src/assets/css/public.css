@@ -13,6 +13,7 @@
 
 .h_body .h_hd{
     float: left;
+    /* cursor: pointer; */
 }
 .h_body .h_hd .logo{
     display: inline-block;
@@ -32,14 +33,18 @@
     width: 100%;
     height: 100%;
     vertical-align: middle;
+    
 }
 .h_body .h_fd{
     float: right;
     display: flex;
     font-size: 16px;
 }
+
 .h_body .h_fd img{
     vertical-align: middle;
+    position: relative;
+    top: -1px;
 }
 .quit{
     margin-left: 10px;

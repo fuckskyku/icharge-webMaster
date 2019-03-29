@@ -33,9 +33,9 @@
               :action="upload_qiniu_url"
               :show-file-list="false"
               :on-success="handleStationSuccess"
-              :on-error="handleError"
               :before-upload="beforeStationUpload"
               :data="qiniuData"
+              :accept="accept"
             >
               <el-button type="success" @click="getQiniuTokenFun();">点击上传图片</el-button>
             </el-upload>
@@ -53,9 +53,9 @@
               :action="upload_qiniu_url"
               :show-file-list="false"
               :on-success="handleSuccess"
-              :on-error="handleError"
-              :before-upload="beforeUpload"
+              :before-upload="beforeStationUpload"
               :data="qiniuData"
+              :accept="accept"
             >
               <el-button type="success" @click="getQiniuTokenFun();">点击上传图片</el-button>
             </el-upload>
@@ -63,7 +63,7 @@
           <el-form-item label="桩站具体地址:" prop="stationAddress">
             <el-input
               class="wd380"
-              @blur="search()"
+              @blur="searchs()"
               v-model="ruleForm.stationAddress"
               placeholder="请填写桩站具体地址"
             ></el-input>
@@ -151,7 +151,6 @@ import {
   getcity,
   getQiniuToken,
   getStationUserInfo
-
 } from "@/api/api";
 import Header from "@/components/publicTemplate/Header";
 import Footer from "@/components/publicTemplate/Footer";
@@ -236,15 +235,15 @@ export default {
       },
       upload_qiniu_url: "https://upload.qiniup.com", // 七牛云上传储存区域的上传域名
       imgQiniuUrl: "http://img.mseenet.com/", //七牛图片外链
-      qiniuToken: ""
+      qiniuToken: "",
+      accept: "image/jpeg, image/png"
     };
   },
   computed: {
-    ...mapState(["token", "ak"])
+    ...mapState(["token", "ak", "companyInfo"])
   },
   mounted() {
     //this.setToKen('')
-
     this.getbanklistFun();
     this.getprovinceFun();
 
@@ -257,9 +256,9 @@ export default {
     });
   },
   methods: {
-    ...mapActions(["setToKen"]),
+    ...mapActions(["setToKen", "setCompanyInfo"]),
     // 返回地址解析结果
-    search() {
+    searchs() {
       var that = this;
       //智能搜索
       that.localSearch = new BMap.LocalSearch(that.map, {
@@ -276,53 +275,54 @@ export default {
     init() {
       // 创建地图实例
       this.map = new BMap.Map("map");
-      getStationUserInfo().then(res =>{
-        console.log("res",res.data)
-        if(res.data.data == null || res.data.data == ""){
-          this.visibility = true
-        }else{
-          this.skip("ApproveFaild")
-        }
-      })
+      getStationUserInfo().then(res => {
+        var companyInfo = res.data.data;
+        var companyInfoObj = [
+          { key: "userId", value: companyInfo.userId },
+          { key: "licenceName", value: companyInfo.licenceName },
+          { key: "staId", value: companyInfo.staId },
+          { key: "licenceCode", value: companyInfo.licenceCode },
+          { key: "licenceImg", value: companyInfo.licenceImg },
+          { key: "managerName", value: companyInfo.managerName },
+          { key: "managerIdcardNo", value: companyInfo.managerIdcardNo },
+          {
+            key: "managerHandIdcardImg",
+            value: companyInfo.managerHandIdcardImg
+          },
+          { key: "bankName", value: companyInfo.bankName },
+          { key: "bankCard", value: companyInfo.bankCard },
+          { key: "bankAdress", value: companyInfo.bankAdress },
+          { key: "staAdress", value: companyInfo.staAdress },
+          { key: "remarks", value: companyInfo.remarks },
+          { key: "staLat", value: companyInfo.staLat },
+          { key: "remarks", value: companyInfo.remarks },
+          { key: "staLng", value: companyInfo.staLng },
+          { key: "status", value: companyInfo.status },
+          { key: "createTime", value: companyInfo.createTime }
+        ];
+        console.log(companyInfoObj);
+        this.setCompanyInfo(companyInfoObj);
+      });
     },
     handleStationSuccess(res, file) {
+      console.log(res);
+
       this.ruleForm.licenseUrl = this.imgQiniuUrl + res.key;
       this.licenseUrl = this.ruleForm.licenseUrl;
     },
     beforeStationUpload(file) {
-      this.qiniuData.key = file.name;
-      const isJPG = file.type === "image/jpeg";
-      const isPNG = file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isJPG && !isPNG) {
-        this.$message.error("上传头像图片只能是 JPG/PNG 格式!");
-      }
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB!");
+        return;
+      } else {
+        this.qiniuData.key = file.name;
       }
-      return isJPG && isLt2M;
+      return isLt2M;
     },
     handleSuccess(res, file) {
       this.ruleForm.identityUrl = this.imgQiniuUrl + res.key;
       this.identityUrl = this.ruleForm.identityUrl;
-    },
-
-    beforeUpload(file) {
-      this.qiniuData.key = file.name;
-      const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
-      }
-      if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
-      }
-      return isJPG && isLt2M;
-    },
-    handleError(res) {
-      console.log(res);
     },
     // 获取七牛token
     getQiniuTokenFun() {

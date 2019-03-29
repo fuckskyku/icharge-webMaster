@@ -4,6 +4,7 @@
       <p>时段电价</p>
     </div>
     <div class="section">
+      <!-- 无数据时 -->
       <div class="cell border" v-if="visibility">
         <div class="sub_title border_rt display">· 时段一
           <div class="tag">示例</div>
@@ -27,87 +28,43 @@
           </div>
         </div>
       </div>
-      <div class="cell border" v-if="!visibility">
-        <div class="sub_title border_rt display">· 时段一</div>
+      <!-- 有数据时 -->
+      <div class="cell border" v-if="!visibility" v-for="(item,index) in tableData" :key="index">
+        <div class="sub_title border_rt display">· 时段{{index + 1}}</div>
         <div class="content border_rt display">
           <div>
-            <p>18:00~22:00</p>
-            <p>09:00~12:00</p>
-            <p>06:00~08:00</p>
+            <p v-for="(list,i) in item.Times" :key="i">{{list}}</p>
           </div>
         </div>
-        <div class="desc display border_rt">在各桩服务费基础上上涨10%</div>
+        <div class="desc display border_rt">
+          <p>{{item.Increase < 0 ? '在各桩服务费基础上下调'+item.Increase*100+'%' : item.Increase > 0 ? '在各桩服务费基础上上涨'+item.Increase*100+'%' : "全天一致的电价" }}</p>
+        </div>
         <div class="handle display">
           <div>
-            <div class="edit" @click="edit()">
-              <el-button class="btn edit_btn" >编辑</el-button>
+            <div class="edit" @click="editElectricity('编辑时段电价');msg=item.Number">
+              <el-button class="btn edit_btn">编辑</el-button>
             </div>
-            <div class="del" @click="del()">
+            <div class="del" @click="del(item.Number)">
               <el-button class="btn del_btn">删除</el-button>
             </div>
           </div>
         </div>
       </div>
       <div class="tip">* 您可通过设置各个时段费用的涨跌（只在“服务费”基础上涨下调，基础的“电费”不会变），来调节各时段前来充电的用户数量，增加充电桩有效利用率。</div>
-      <el-button class="add_btn" @click="createElectricity('新增时段电价')">新增时段电价</el-button>
+      <el-button class="add_btn" @click="addElectricity('新增时段电价')">新增时段电价</el-button>
     </div>
     <!-- dialog -->
-    <el-dialog :title="title" :visible.sync="dialogFormVisible">
-      <div class="dialog_section">
-        <div>时段:</div>
-        <div class="item" v-for="(item,index) in arr" :key="index">
-          <div class="lt">
-            <el-time-select
-              placeholder="起始时间"
-              class="wd200"
-              v-model="item.startTime"
-              :picker-options="{
-            start: '08:30',
-            step: '00:15',
-            end: '18:30'
-          }"
-            ></el-time-select>
-            <span>——</span>
-            <el-time-select
-              placeholder="结束时间"
-              v-model="item.endTime"
-              class="wd200"
-              :picker-options="{
-            start: '08:30',
-            step: '00:15',
-            end: '18:30',
-            minTime: startTime
-          }"
-            ></el-time-select>
-          </div>
-          <div class="rt">
-            <img class="dialog_btn dialog_del" @click="editStage('del')" v-if="arr.length != 1" src="/static/img/home_other/ic_del.png" alt="">
-            <img class="dialog_btn dialog_add" @click="editStage('add')" v-if="index == arr.length - 1" src="/static/img/home_other/ic_add.png" alt="">
-          </div>
-        </div>
-        <div class="">
-          <div class="sel">涨跌比例:</div>
-          <el-select class="wd400" v-model="value" placeholder="请选择比例">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-        </div>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button class="add_btn wd110" @click="addElectricity()">确 定</el-button>
-      </div>
-    </el-dialog>
-    <!-- <electricityDialog v-if="dialogFormVisible" @getMessage="showMsg()" :msg="msg" :title="title" /> -->
+    <electricityDialog v-if="dialogFormVisible" @getMessage="showMsg" :msg="msg" :title="title"></electricityDialog>
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
 import electricityDialog from "@/components/pages/dialog/electricityDialog";
+import {
+  getstationintervalpricelist,
+  deletestationtimeintervalprice
+} from "@/api/api";
 
 export default {
   data() {
@@ -115,34 +72,25 @@ export default {
       tableData: [],
       visibility: true,
       dialogFormVisible: false,
-      msg: "123",
+      msg: "0",
       title: "",
-      formLabelWidth: "120px",
-      startTime: "",
-      endTime: "",
-      arr: [
-        { startTime: "00:00", endTime: "12:00" },
-        { startTime: "00:00", endTime: "12:00" }
-      ],
-      ruleForm: {
-        title: "新增时段电价"
-      },
-      options: [
-        {
-          value: "选项1",
-          label: "黄金糕"
-        }
-      ],
-      value: ""
+      formLabelWidth: "120px"
     };
   },
   computed: {
     ...mapState(["token"])
   },
-  mounted() {},
+  mounted() {
+    this.init();
+  },
   methods: {
     ...mapActions(["setToKen"]),
-    createElectricity(title) {
+
+    init() {
+      this.getstationintervalpricelistFun();
+    },
+    addElectricity(title) {
+      this.msg = 0;
       this.title = title;
       this.dialogFormVisible = true;
     },
@@ -150,22 +98,44 @@ export default {
       this.title = title;
       this.dialogFormVisible = true;
     },
-    addElectricity() {
-
-    },
-    editStage(params,index) {
-      var that = this
-      if(params == 'add'){
-        this.arr.push({startTime: '00:00',endTime: '12:00'})
-      }else{
-        var slice = that.arr.splice(index,1)
-      }
-      console.log(this.arr)
-    },
     edit() {
       this.dialogFormVisible = true;
       console.log("12132");
     },
+    // 删除时段电价列表
+    del(param) {
+      console.log(param);
+      this.$confirm("是否删除该时段电价?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          deletestationtimeintervalprice({
+            timeNumber: param
+          }).then(res => {
+            if (res.data.code == 200) {
+              this.$message({
+                type: "success",
+                message: "删除成功!"
+              });
+              this.getstationintervalpricelistFun();
+            } else {
+              this.$message({
+                type: "error",
+                message: res.data.message
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+    },
+
     skip(type, param) {
       this.$router.push({
         name: type,
@@ -174,11 +144,28 @@ export default {
         }
       });
     },
-    showMsg(visibility) {
-      this.dialogFormVisible = visibility;
+    showMsg(val) {
+      console.log(val);
+      this.dialogFormVisible = val;
+      this.getstationintervalpricelistFun();
     },
-    del() {
-      alert(1111);
+    getstationintervalpricelistFun() {
+      getstationintervalpricelist({
+        pageNumber: 1,
+        pageSize: 30
+      }).then(res => {
+        if (res.data.code == 200) {
+          if (res.data.data != null) {
+            this.tableData = res.data.data;
+            this.tableData.map((item, index) => {
+              item.Times = item.Times.split("|");
+            });
+            this.visibility = false;
+          } else {
+            this.visibility = true;
+          }
+        }
+      });
     }
   },
   components: {
@@ -200,12 +187,12 @@ export default {
     }
   }
   .section {
-    width: 600px;
+    width: 750px;
     margin: 42px auto;
   }
   .cell {
-    width: 600px;
-    height: 120px;
+    width: 700px;
+    min-height: 100px;
     display: flex;
     text-align: center;
     .display {
@@ -232,6 +219,7 @@ export default {
     }
     .content {
       flex: 4;
+      padding: 10px;
     }
     .desc {
       flex: 9;
@@ -314,14 +302,14 @@ export default {
       margin: 20px 0;
       display: flex;
       // justify-content: center;
-      align-items : center; 
-      .lt{
+      align-items: center;
+      .lt {
         flex: 7;
       }
-      .rt{
+      .rt {
         flex: 2;
         // display: flex;
-        // align-items : center; 
+        // align-items : center;
       }
     }
     .sel {

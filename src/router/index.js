@@ -35,6 +35,11 @@ export default new Router({
       component: QualityApproval
     },
     {
+      path: '/Approve',
+      name: 'Approve',
+      component: Approve
+    },
+    {
       path: '/ApproveFaild',
       name: 'ApproveFaild',
       component: ApproveFaild

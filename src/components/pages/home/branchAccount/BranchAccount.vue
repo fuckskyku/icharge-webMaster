@@ -10,7 +10,7 @@
             <span style="float:right;">
               <el-button
                 class="add"
-                @click="dialogFormVisible = true;dis = true;accountDis = true"
+                @click="addAccount"
               >新建</el-button>
             </span>
           </el-row>
@@ -39,34 +39,19 @@
       </el-container>
     </div>
     <!-- dialog -->
-    <el-dialog :title="ruleForm.title" :visible.sync="dialogFormVisible">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-        <el-form-item label="账号" :label-width="formLabelWidth" prop="account">
-          <el-input class="wd380" :disabled="accountDis" v-model="ruleForm.account"></el-input>
-        </el-form-item>
-        <el-form-item label="姓名" :label-width="formLabelWidth" prop="name">
-          <el-input class="wd380" :disabled="dis" v-model="ruleForm.name"></el-input>
-        </el-form-item>
-        <el-form-item label="角色" :label-width="formLabelWidth" prop="role">
-          <el-input class="wd380" :disabled="dis" v-model="ruleForm.role"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button class="create_account" @click="addAcound('ruleForm')">确 定</el-button>
-      </div>
-    </el-dialog>
+    <branchAccountDialog v-if="dialogFormVisible" @getMessage="showMsg" :title="title"></branchAccountDialog>
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
+import branchAccountDialog from "@/components/pages/dialog/branchAccountDialog";
 
 export default {
   data() {
     return {
       dialogFormVisible: false,
-      dis: false,
-      accountDis: false,
+      title: "新增子账号",
       tableData: [
         {
           account: "sc30",
@@ -75,18 +60,6 @@ export default {
         },
         { account: "sc30", name: "库昊", role: "超级管理员" }
       ],
-      ruleForm: {
-        account: "",
-        name: "",
-        role: "",
-        title: "新增子账号"
-      },
-      rules: {
-        account: [{ required: true, message: "请输入账号", trigger: "blur" }],
-        name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
-        role: [{ required: true, message: "请输入角色", trigger: "blur" }]
-      },
-      formLabelWidth: "120px"
     };
   },
   computed: {
@@ -109,62 +82,22 @@ export default {
         }
       });
     },
-
-    addAcound(form) {
-      if (this.ruleForm.title == "新增子账号") {
-        this.$refs[form].validate(valid => {
-          if (valid) {
-            this.$message({
-              type: "success",
-              message: "创建成功!"
-            });
-            this.dialogFormVisible = false;
-          } else {
-            return false;
-          }
-        });
-      } else if (this.ruleForm.title == "修改子账号") {
-        this.$refs[form].validate(valid => {
-          if (valid) {
-            this.$confirm("确认修改?", "提示", {
-              confirmButtonText: "确定",
-              cancelButtonText: "取消",
-              type: "warning",
-              center: true
-            })
-              .then(() => {
-                this.$message({
-                  type: "success",
-                  message: "修改成功!"
-                });
-                this.dialogFormVisible = false;
-              })
-              .catch(() => {
-                this.$message({
-                  type: "info",
-                  message: "已取消修改"
-                });
-              });
-            this.dialogFormVisible = false;
-          } else {
-            return false;
-          }
-        });
-      } else {
-        this.dialogFormVisible = false;
-      }
+    showMsg(val) {
+      this.dialogFormVisible = val
+    },
+    addAccount() {
+      this.title = "新增子账号"
+      this.dialogFormVisible = true
     },
     examine(row, id) {
-      this.dis = true;
-      this.accountDis = true;
       this.dialogFormVisible = true;
-      this.ruleForm.title = "查看子账号";
+      this.title = "查看子账号";
     },
     edit(row, id) {
       this.dis = false;
       this.accountDis = true;
       this.dialogFormVisible = true;
-      this.ruleForm.title = "修改子账号";
+      this.title = "修改子账号";
     },
     del() {
       this.$confirm("是否删除该账号?", "提示", {
@@ -193,7 +126,9 @@ export default {
       }
     }
   },
-  components: {}
+  components: {
+    branchAccountDialog
+  }
 };
 </script>
 <style scoped lang="less">

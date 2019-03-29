@@ -15,11 +15,15 @@
             stripe
             style="width: 100%"
           >
-            <el-table-column prop="time" label="时间"></el-table-column>
-            <el-table-column prop="energy" label="电量"></el-table-column>
+            <el-table-column prop="createTime" label="时间">
+              <template slot-scope="scope">
+                <span>{{ scope.row.createTime | formatDate }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="degree" label="电量"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button @click="skip('ElectricityBillDetails')" class="btn examine_btn">查看</el-button>
+                <el-button @click="skip('ElectricityBillDetails',scope.row.id)" class="btn examine_btn">查看</el-button>
                 <!-- <el-button @click="skip('ElectricityBillsDetails',scope.row.id)" class="btn examine_btn">查看</el-button> -->
               </template>
             </el-table-column>
@@ -33,29 +37,36 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import { getchargeorderlist } from "@/api/api";
 
 export default {
   data() {
     return {
-      tableData: [
-        {
-          time: "2018年11月9日15:45:30",
-          energy: "100",
-        },
-        { time: "2018年11月9日15:45:30", energy: "库昊" }
-      ],
+      tableData: [],
     };
   },
   computed: {
     ...mapState(["token"])
   },
-  mounted() {},
+  mounted() {
+    this.init()
+  },
   methods: {
     ...mapActions(["setToKen"]),
+    init() {
+      getchargeorderlist({
+        pageNumber:1,
+        pageSize: 30
+      }).then(res =>{
+        if(res.data.code == 200) {
+          this.tableData = res.data.data.list
+        }
+      })
+    },
     skip(type, param) {
       this.$router.push({
         name: type,
-        params: {
+        query: {
           id: param
         }
       });

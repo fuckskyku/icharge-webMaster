@@ -1,13 +1,3 @@
-
-//获取cookie、
-export function getCookie(value) {
-  var arr, reg = new RegExp("(^| )" + value + "=([^;]*)(;|$)");
-  if (arr = document.cookie.match(reg))
-    return (arr[2]);
-  else
-    return null;
-}
-
 /**
  * 验证必填元素
  */
@@ -161,7 +151,6 @@ export function formatImgUrl(imgUlr) {
     if (this.url(imgUlr)) {
       return imgUlr;
     } else {
-      // return "https://admin.school.mseenet.com" + imgUlr;
        return "http://img.mseenet.com/" + imgUlr;
     }
   }

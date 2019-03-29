@@ -22,7 +22,7 @@
                 src="/static/img/login_register_findPassword/ic_password.png"
                 alt=""
               >
-              <input class="v_input" type="password" v-model="loginForm.password" placeholder="请输入密码">
+              <input class="v_input" v-model="loginForm.password" placeholder="请输入密码" show-password>
             </el-form-item>
             <el-form-item label-width="0px" prop="code">
               <img
@@ -86,6 +86,7 @@ export default {
   },
   created() {},
   mounted() {
+    var that = this
     this.randomImg();
   },
   methods: {
@@ -99,8 +100,6 @@ export default {
     },
     submitLogin(form) {
       var that = this;
-      console.log(this.sessionId);
-
       this.$refs[form].validate(valid => {
         if (valid) {
           isregistermobile({
@@ -108,7 +107,7 @@ export default {
           }).then(res => {
             if (res.data.code == 200) {
               if (res.data.data.isRegister == true) {
-                console.log("this.sessionId", that.sessionId);
+                // console.log("this.sessionId", that.sessionId);
                 login({
                   Mobile: that.loginForm.account,
                   Code: that.loginForm.code,
@@ -116,7 +115,6 @@ export default {
                   SessionId: that.sessionId
                 }).then(res => {
                   if (res.data.code == 200) {
-                    console.log(res.data.data);
                     var userInfo = res.data.data;
                     that.$notify({
                       title: "提示",
@@ -149,20 +147,25 @@ export default {
                         value: userInfo.staId
                       },
                       {
+                        key: "mobile",
+                        value: userInfo.mobile
+                      },
+                      {
                         key: "hasCredient",
                         value: userInfo.hasCredient
                       }
                     ];
+                    that.setToKen(that.userInfo.token);
                     that.setUserInfo(userInfoObj);
-                    that.setToKen(res.data.data.token);
-                    console.log(that.userInfo);
-                    this.skip("Home");
+                    that.saveLocalStorage("GLOBAL_TOKEN", res.data.data.token);
+                    that.skip("Home")
                   } else {
                     that.$notify({
                       title: "提示",
                       message: res.data.message,
                       type: "error"
                     });
+                    that.randomImg();
                   }
                 });
               } else {

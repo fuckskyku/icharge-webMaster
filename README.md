@@ -112,7 +112,7 @@
 git clone 
 
 ### 切换到项目所在文件夹
-cd newlife-webMaster
+cd oneball
 
 ### 安装依赖
 npm install ...

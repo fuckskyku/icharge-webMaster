@@ -5,64 +5,79 @@
     </div>
     <div class="section">
       <div class="tabel_main">
-      <el-container>
-        <el-main>
-          <el-table
-            :data="tableData"
-            :row-style="{'border': 'none','text-align':'center'}"
-            :header-cell-style="tableHeaderColor"
-            :cell-style="{textAlign:'center',color:'#0C0C0C'}"
-            stripe
-            style="width: 100%"
-          >
-            <el-table-column prop="time" label="时间"></el-table-column>
-            <el-table-column prop="type" label="类型"></el-table-column>
-            <el-table-column prop="remark" label="备注"></el-table-column>
-            <el-table-column prop="price" label="金额"></el-table-column>
-            <el-table-column label="操作">
-              <template slot-scope="scope">
-                <el-button @click="skip('MoneyBillDetails')" class="btn examine_btn">查看</el-button>
-                <!-- <el-button @click="skip('ElectricityBillsDetails',scope.row.id)" class="btn examine_btn">查看</el-button> -->
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-main>
-      </el-container>
-    </div>
+        <el-container>
+          <el-main>
+            <el-table
+              :data="tableData"
+              :row-style="{'border': 'none','text-align':'center'}"
+              :header-cell-style="tableHeaderColor"
+              :cell-style="{textAlign:'center',color:'#0C0C0C'}"
+              stripe
+              style="width: 100%"
+            >
+              <el-table-column prop="createTime" label="时间" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.createTime | formatDate }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="name" label="类型"></el-table-column>
+              <el-table-column prop="remark" label="备注"></el-table-column>
+              <el-table-column prop="price" label="金额"></el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                  <el-button @click="skip('MoneyBillDetails',scope.row.id)" class="btn examine_btn">查看</el-button>
+                  <!-- <el-button @click="skip('ElectricityBillsDetails',scope.row.id)" class="btn examine_btn">查看</el-button> -->
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-main>
+        </el-container>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
-
+import { getstationchargespendloglist } from "@/api/api";
 export default {
   data() {
     return {
-      tableData: [
-        {
-          time: "2018年11月9日15:45:30",
-          type: "收入",
-          remark: "充电",
-          price: "68",
-        },
-        { time: "2018年11月9日15:45:30",
-          type: "收入",
-          remark: "充电",
-          price: "68", }
-      ],
+      tableData: [],
     };
   },
   computed: {
     ...mapState(["token"])
   },
-  mounted() {},
+  mounted() {
+    this.init();
+    this.tableData = [
+      {
+        id: 1,
+        name: "消费",
+        remark: "25252",
+        price: 1,
+        createTime: 1550823174
+      }
+    ];
+  },
   methods: {
     ...mapActions(["setToKen"]),
+    init() {
+      getstationchargespendloglist({
+        pageNumber: 1,
+        pageSize: 30
+      }).then(res => {
+        if (res.data.code == 200 && res.data.data != null) {
+          this.tableData = res.data.data.list;
+        }
+        console.log(this.tableData);
+      });
+    },
     skip(type, param) {
       this.$router.push({
         name: type,
-        params: {
+        query: {
           id: param
         }
       });
