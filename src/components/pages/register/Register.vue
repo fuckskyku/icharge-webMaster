@@ -77,7 +77,7 @@
         <div class="section sec">
           <div class="success_icon"><img src="/static/img/login_register_findPassword/img_success.png" alt=""></div>
           <div class="desc">
-            <p>您绑定的手机号是{{registerForm.account}}，此手机号是登录新活充电桩站管理后台的账号。</p>
+            <p>您绑定的手机号是{{registerForm.account}}，此手机号是登录喵喵充电桩站管理后台的账号。</p>
             <p>进行资质认证，您将体验更多功能。</p>
           </div>
           <el-button type="success" class="submit quality" @click="skip('Login')">立即进行资质认证</el-button>

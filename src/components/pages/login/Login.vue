@@ -2,7 +2,7 @@
   <div class="login parent">
     <div class="child">
       <div class="container">
-        <div class="title">新活充电桩站管理后台</div>
+        <div class="title">喵喵充电桩站管理后台</div>
         <div class="head">充电桩场站运营商账号登录</div>
         <div class="section">
           <el-form

@@ -5,7 +5,7 @@
         <div class="logo">
           <img src="/static/img/logo.png" alt="">
         </div>
-        <span>新活充电桩站管理后台</span>
+        <span>喵喵充电桩站管理后台</span>
       </div>
       <div class="h_fd" v-if="token == ''">登录</div>
       <div class="h_fd" v-if="token != ''">
